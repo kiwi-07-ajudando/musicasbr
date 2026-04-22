@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Streaming por R$10 | Chame no WhatsApp</title>
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body{
+      background:#111;
+      color:#fff;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+      padding:20px;
+    }
+
+    .container{
+      max-width:600px;
+      width:100%;
+      background:#1c1c1c;
+      border-radius:20px;
+      padding:40px 30px;
+      text-align:center;
+      box-shadow:0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    h1{
+      font-size:32px;
+      margin-bottom:15px;
+    }
+
+    p{
+      font-size:18px;
+      color:#ccc;
+      margin-bottom:25px;
+      line-height:1.6;
+    }
+
+    .streamings{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap:12px;
+      margin-bottom:30px;
+    }
+
+    .item{
+      background:#2a2a2a;
+      padding:12px;
+      border-radius:10px;
+      font-size:16px;
+      font-weight:bold;
+    }
+
+    .price{
+      font-size:28px;
+      font-weight:bold;
+      margin-bottom:25px;
+    }
+
+    .btn{
+      display:inline-block;
+      background:#25D366;
+      color:#fff;
+      text-decoration:none;
+      padding:16px 28px;
+      border-radius:12px;
+      font-size:18px;
+      font-weight:bold;
+      transition:0.3s;
+    }
+
+    .btn:hover{
+      opacity:0.9;
+      transform:scale(1.03);
+    }
+
+    .support{
+      margin-top:20px;
+      font-size:14px;
+      color:#aaa;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Assine seus Streamings</h1>
+    <p>Os melhores streamings por apenas <strong>R$10 por mês</strong>.  
+    Atendimento rápido e suporte direto no WhatsApp.</p>
+
+    <div class="streamings">
+      <div class="item">Netflix</div>
+      <div class="item">Disney+</div>
+      <div class="item">Prime Video</div>
+      <div class="item">HBO Max</div>
+      <div class="item">Globoplay</div>
+      <div class="item">Paramount+</div>
+    </div>
+
+    <div class="price">Planos a partir de R$10</div>
+
+    <a class="btn" href="https://wa.me/55SEUNUMERO" target="_blank">
+      Chamar no WhatsApp
+    </a>
+
+    <div class="support">
+      Atendimento imediato • Acesso rápido • Suporte garantido
+    </div>
+  </div>
+
+</body>
+</html>
