@@ -8,8 +8,8 @@
 // permitir isso).
 
 // ─── CONFIGURE AQUI ───────────────────────────────────────────
-define('SYNCPAY_CLIENT_ID', 'COLOQUE_SEU_CLIENT_ID_AQUI');
-define('SYNCPAY_CLIENT_SECRET', 'COLOQUE_SEU_CLIENT_SECRET_AQUI');
+define('SYNCPAY_CLIENT_ID', '2e5daa15-df51-478e-a39d-17532d4941db');
+define('SYNCPAY_CLIENT_SECRET', '6c115f95-ed70-4b26-a245-a8decf39466d');
 define('SYNCPAY_BASE_URL', 'https://api.syncpayments.com.br');
 
 // URL pública do seu webhook-pix.php, para receber a confirmação de
