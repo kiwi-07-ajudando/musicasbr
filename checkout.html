@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pagamento via Pix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #F2F4F1;
+    --surface: #FFFFFF;
+    --ink: #10231D;
+    --ink-soft: #4B5B54;
+    --teal: #0E8F7F;
+    --teal-deep: #0B3B36;
+    --line: #D9DED9;
+    --urgent: #C2410C;
+    --urgent-bg: #FDECE3;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  body{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:32px 16px 56px;
+  }
+
+  .brandbar{
+    width:100%;
+    max-width:460px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:22px;
+  }
+
+  .brandbar .merchant{
+    font-size:14px;
+    font-weight:500;
+    color:var(--ink-soft);
+  }
+
+  .brandbar .lock{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+
+  .ticket{
+    width:100%;
+    max-width:460px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    position:relative;
+  }
+
+  /* ---------- Topo: valor e descrição ---------- */
+  .ticket-head{
+    padding:30px 28px 22px;
+    text-align:center;
+  }
+
+  .ticket-head .label{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin:0 0 6px;
+  }
+
+  .ticket-head .amount{
+    font-family:'Fraunces', serif;
+    font-size:44px;
+    font-weight:500;
+    line-height:1;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+
+  .ticket-head .amount sup{
+    font-size:20px;
+    font-weight:500;
+    top:-0.9em;
+  }
+
+  .ticket-head .description{
+    margin:10px 0 0;
+    font-size:14.5px;
+    color:var(--ink-soft);
+  }
+
+  /* ---------- Cronômetro ---------- */
+  .timer-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    padding:12px 20px;
+    background:var(--teal-deep);
+    color:#EAF6F3;
+  }
+
+  .timer-row.urgent{
+    background:var(--urgent-bg);
+    color:var(--urgent);
+  }
+
+  .timer-row .timer-text{
+    font-size:13.5px;
+  }
+
+  .timer-row .timer-clock{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14.5px;
+    font-weight:600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing:0.02em;
+  }
+
+  /* ---------- Divisória estilo canhoto de ticket ---------- */
+  .perforation{
+    position:relative;
+    height:0;
+    border-top:1.5px dashed var(--line);
+    margin:0 0;
+  }
+  .perforation::before,
+  .perforation::after{
+    content:"";
+    position:absolute;
+    top:-9px;
+    width:18px;
+    height:18px;
+    background:var(--paper);
+    border-radius:50%;
+  }
+  .perforation::before{ left:-9px; }
+  .perforation::after{ right:-9px; }
+
+  /* ---------- QR Code ---------- */
+  .qr-section{
+    padding:26px 28px 22px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .qr-frame{
+    width:220px;
+    height:220px;
+    padding:10px;
+    background:#fff;
+    border:1px solid var(--line);
+  }
+
+  .qr-frame img{
+    width:100%;
+    height:100%;
+    display:block;
+  }
+
+  .qr-hint{
+    margin:14px 0 0;
+    font-size:13px;
+    color:var(--ink-soft);
+    text-align:center;
+    max-width:280px;
+  }
+
+  /* ---------- Copia e Cola ---------- */
+  .copy-section{
+    padding:4px 28px 28px;
+  }
+
+  .copy-section .label{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0 0 8px;
+  }
+
+  .copy-row{
+    display:flex;
+    border:1px solid var(--line);
+    background:#FAFBFA;
+  }
+
+  .copy-row input{
+    flex:1;
+    border:none;
+    background:transparent;
+    padding:12px 12px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink);
+    min-width:0;
+  }
+
+  .copy-row input:focus{ outline:none; }
+
+  .copy-btn{
+    border:none;
+    border-left:1px solid var(--line);
+    background:var(--teal);
+    color:#fff;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:13.5px;
+    font-weight:500;
+    padding:0 18px;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+
+  .copy-btn:hover{ background:var(--teal-deep); }
+  .copy-btn.copied{ background:var(--teal-deep); }
+
+  /* ---------- Status ---------- */
+  .status-line{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:14px 28px 26px;
+    font-size:13.5px;
+    color:var(--ink-soft);
+  }
+
+  .status-dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:var(--teal);
+    animation:pulse 1.6s ease-in-out infinite;
+    flex-shrink:0;
+  }
+
+  @keyframes pulse{
+    0%,100%{ opacity:1; }
+    50%{ opacity:.35; }
+  }
+
+  /* ---------- Telas de estado: pago / expirado ---------- */
+  .state-screen{
+    padding:52px 28px 46px;
+    text-align:center;
+  }
+
+  .state-screen .icon{
+    width:52px;
+    height:52px;
+    margin:0 auto 18px;
+  }
+
+  .state-screen h2{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:24px;
+    margin:0 0 8px;
+  }
+
+  .state-screen p{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin:0 auto;
+    max-width:300px;
+  }
+
+  .retry-btn{
+    margin-top:22px;
+    border:1px solid var(--ink);
+    background:transparent;
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:13.5px;
+    font-weight:500;
+    padding:11px 22px;
+    cursor:pointer;
+  }
+  .retry-btn:hover{ background:var(--ink); color:#fff; }
+
+  .hidden{ display:none !important; }
+
+  .footnote{
+    max-width:460px;
+    width:100%;
+    text-align:center;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:18px;
+    line-height:1.6;
+  }
+
+  @media (max-width:420px){
+    .ticket-head .amount{ font-size:36px; }
+    .qr-frame{ width:190px; height:190px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="brandbar">
+    <span class="merchant" id="merchantName">Sua Loja</span>
+    <span class="lock">
+      <svg width="12" height="14" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="6" width="10" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M3 6V4a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      pagamento seguro
+    </span>
+  </div>
+
+  <div class="ticket">
+
+    <!-- ESTADO: carregando -->
+    <div id="loadingState" class="state-screen">
+      <h2>Gerando seu Pix…</h2>
+      <p>Isso leva só alguns segundos.</p>
+    </div>
+
+    <!-- ESTADO: erro -->
+    <div id="errorState" class="state-screen hidden">
+      <h2>Não foi possível gerar o Pix</h2>
+      <p id="errorMessage">Tente novamente em instantes.</p>
+      <button class="retry-btn" onclick="location.href='planos.html'">Voltar aos pacotes</button>
+    </div>
+
+    <!-- ESTADO: aguardando pagamento -->
+    <div id="pendingState" class="hidden">
+      <div class="ticket-head">
+        <p class="label">Valor a pagar</p>
+        <p class="amount"><sup>R$</sup><span id="amountValue">0,00</span></p>
+        <p class="description" id="descriptionValue">Pagamento via Pix</p>
+      </div>
+
+      <div class="timer-row" id="timerRow">
+        <span class="timer-text">Pague em até</span>
+        <span class="timer-clock" id="timerClock">15:00</span>
+      </div>
+
+      <div class="perforation"></div>
+
+      <div class="qr-section">
+        <div class="qr-frame">
+          <img id="qrImage" src="" alt="QR Code do Pix" />
+        </div>
+        <p class="qr-hint">Abra o app do seu banco, escolha pagar com Pix e escaneie o código acima.</p>
+      </div>
+
+      <div class="copy-section">
+        <p class="label">Ou use o Pix Copia e Cola</p>
+        <div class="copy-row">
+          <input type="text" id="pixCode" readonly />
+          <button class="copy-btn" id="copyBtn">Copiar</button>
+        </div>
+      </div>
+
+      <div class="status-line">
+        <span class="status-dot"></span>
+        <span>Aguardando confirmação do pagamento…</span>
+      </div>
+    </div>
+
+    <!-- ESTADO: pago -->
+    <div id="paidState" class="state-screen hidden">
+      <svg class="icon" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="26" cy="26" r="25" stroke="#0E8F7F" stroke-width="2"/>
+        <path d="M15 27l7.5 7.5L37 19" stroke="#0E8F7F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h2>Pagamento confirmado</h2>
+      <p>Recebemos o seu Pix. Obrigado pela compra!</p>
+    </div>
+
+    <!-- ESTADO: expirado -->
+    <div id="expiredState" class="state-screen hidden">
+      <svg class="icon" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="26" cy="26" r="25" stroke="#C2410C" stroke-width="2"/>
+        <path d="M26 15v12l8 6" stroke="#C2410C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h2>O tempo para pagar acabou</h2>
+      <p>Gere um novo código Pix para concluir a compra.</p>
+      <button class="retry-btn" onclick="iniciarCheckout()">Gerar novo Pix</button>
+      <button class="retry-btn" style="margin-left:10px" onclick="location.href='planos.html'">Trocar de pacote</button>
+    </div>
+
+  </div>
+
+  <p class="footnote">Pagamento processado via Pix. Não compartilhe o código copia e cola com terceiros.</p>
+
+<script>
+  // ---------------------------------------------------------------------
+  // Configuração deste checkout.
+  //
+  // O pacote escolhido chega pela URL (?plano=bronze|prata|ouro), vindo da
+  // página planos.html. Repare que só o ID do pacote viaja na URL — o VALOR
+  // em reais é sempre resolvido pelo servidor (server.js), nunca lido daqui.
+  // Isso evita que alguém edite o link para pagar um valor diferente.
+  // ---------------------------------------------------------------------
+  const params = new URLSearchParams(window.location.search);
+
+  const CHECKOUT_CONFIG = {
+    apiBaseUrl: '', // se os .php estiverem noutro domínio/pasta, termine com "/", ex: 'https://seudominio.com/'
+    merchantName: 'Sua Loja',
+    plano: params.get('plano'), // ex: 'bronze', 'prata', 'ouro'
+    customer: null, // ex: { name, cpf, email, phone }
+  };
+
+  const els = {
+    loading: document.getElementById('loadingState'),
+    error: document.getElementById('errorState'),
+    errorMessage: document.getElementById('errorMessage'),
+    pending: document.getElementById('pendingState'),
+    paid: document.getElementById('paidState'),
+    expired: document.getElementById('expiredState'),
+    amount: document.getElementById('amountValue'),
+    description: document.getElementById('descriptionValue'),
+    qrImage: document.getElementById('qrImage'),
+    pixCode: document.getElementById('pixCode'),
+    copyBtn: document.getElementById('copyBtn'),
+    timerClock: document.getElementById('timerClock'),
+    timerRow: document.getElementById('timerRow'),
+    merchantName: document.getElementById('merchantName'),
+  };
+
+  els.merchantName.textContent = CHECKOUT_CONFIG.merchantName;
+
+  let pollTimer = null;
+  let countdownTimer = null;
+
+  function showOnly(el){
+    [els.loading, els.error, els.pending, els.paid, els.expired].forEach(s => s.classList.add('hidden'));
+    el.classList.remove('hidden');
+  }
+
+  function formatBRL(value){
+    return Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  async function iniciarCheckout(){
+    showOnly(els.loading);
+    clearInterval(pollTimer);
+    clearInterval(countdownTimer);
+
+    if(!CHECKOUT_CONFIG.plano){
+      els.errorMessage.textContent = 'Nenhum pacote foi selecionado. Volte e escolha um pacote.';
+      showOnly(els.error);
+      return;
+    }
+
+    try{
+      const res = await fetch(`${CHECKOUT_CONFIG.apiBaseUrl}gerar-pix.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plano: CHECKOUT_CONFIG.plano,
+        }),
+      });
+
+      const data = await res.json();
+
+      if(!res.ok){
+        throw new Error(data.error || data.message || 'Erro ao gerar cobrança.');
+      }
+
+      els.amount.textContent = formatBRL(data.amount);
+      els.description.textContent = data.description;
+      els.qrImage.src = data.qr_code_image;
+      els.pixCode.value = data.pix_code;
+
+      showOnly(els.pending);
+      iniciarCronometro(data.expires_in_seconds);
+      iniciarPolling(data.identifier);
+
+    }catch(err){
+      els.errorMessage.textContent = err.message || 'Tente novamente em instantes.';
+      showOnly(els.error);
+    }
+  }
+
+  function iniciarCronometro(totalSeconds){
+    let remaining = totalSeconds;
+    atualizarRelogio(remaining);
+
+    countdownTimer = setInterval(() => {
+      remaining -= 1;
+
+      if(remaining <= 0){
+        clearInterval(countdownTimer);
+        clearInterval(pollTimer);
+        showOnly(els.expired);
+        return;
+      }
+
+      atualizarRelogio(remaining);
+
+      if(remaining <= 60){
+        els.timerRow.classList.add('urgent');
+      }
+    }, 1000);
+  }
+
+  function atualizarRelogio(totalSeconds){
+    const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+    const s = Math.floor(totalSeconds % 60).toString().padStart(2, '0');
+    els.timerClock.textContent = `${m}:${s}`;
+  }
+
+  function iniciarPolling(identifier){
+    pollTimer = setInterval(async () => {
+      try{
+        const res = await fetch(`${CHECKOUT_CONFIG.apiBaseUrl}consultar-status.php?identifier=${encodeURIComponent(identifier)}`);
+        const data = await res.json();
+
+        if(data.status === 'completed' || data.status === 'paid'){
+          clearInterval(pollTimer);
+          clearInterval(countdownTimer);
+          showOnly(els.paid);
+        }
+      }catch(err){
+        // Falha pontual de rede: ignora e tenta de novo no próximo ciclo.
+        console.warn('Falha ao consultar status:', err.message);
+      }
+    }, 5000);
+  }
+
+  els.copyBtn.addEventListener('click', async () => {
+    try{
+      await navigator.clipboard.writeText(els.pixCode.value);
+    }catch(err){
+      els.pixCode.select();
+      document.execCommand('copy');
+    }
+    els.copyBtn.textContent = 'Copiado!';
+    els.copyBtn.classList.add('copied');
+    setTimeout(() => {
+      els.copyBtn.textContent = 'Copiar';
+      els.copyBtn.classList.remove('copied');
+    }, 2000);
+  });
+
+  iniciarCheckout();
+</script>
+
+</body>
+</html>
